@@ -1,0 +1,1 @@
+ffmpeg -i input.mp4 -c:v copy -c:a copy -f hls -hls_time 1 -hls_playlist_type vod -hls_segment_filename "output_%3d.ts" output.m3u8
