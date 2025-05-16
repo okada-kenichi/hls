@@ -21,12 +21,29 @@ hls.shに記述してあるコマンドをzshから実行する
 ```
 ffmpeg -i 元ファイル名.mp4 -c:v copy -c:a copy -f hls -hls_time 1 -hls_playlist_type vod -hls_segment_filename "分割ファイル名_%3d.ts" エンドポイント.m3u8
 ```
-分割ファイル名とエンドポイント名は毎回変える必要は無いので、元ファイルだけ適宜変えれば良い。
+
+### 実際のコマンド
+```
+for file in *.mp4; do
+  # 拡張子を除いたファイル名を取得（例：video.mp4 → video）
+  name="${file%.*}"
+  
+  # 出力用のディレクトリを作成（例：video/）
+  mkdir -p "$name"
+  
+  # HLS に変換し、output.m3u8 と output_000.ts 等を出力
+  ffmpeg -i "$file" -c:v copy -c:a copy -f hls \
+    -hls_time 1 -hls_playlist_type vod \
+    -hls_segment_filename "${name}/output_%03d.ts" \
+    "${name}/output.m3u8"
+done
+```
+変換したい動画をカレントディレクトリにまとめて上記コマンドを実行すれば、同一ファイル名で作ったフォルダの中に、変換ファイルを出力します。
 
 ## 分割したファイル群をWebサーバーにアップ
 サーバーによっては実行権限など調整が必要かもしれない
 ## アップしたURLをendpoint.htmlに記述
-エンドポイント名を固定しておけば、毎回同じendpoint.htmlで済むかもしれない
+エンドポイント名を固定してあるので、毎回同じendpoint.htmlで済む
 ## endpoint.htmlをアップしたURLをエンドポイントとする
 endpoint.htmlを任意の場所にアップし、そこURLがエンドポイントとなる。
 ## エンドポイントにアクセスすると動画がストリーミング再生される
